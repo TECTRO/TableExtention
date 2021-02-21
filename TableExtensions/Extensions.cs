@@ -1,21 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
-namespace TableLab
+namespace TableExtensions
 {
-    public class TableNode
-    {
-        public string Title { get; set; }
-        public object Value { get; set; }
-
-        public override string ToString()
-        {
-            return string.Join("; ", GetType().GetRuntimeProperties().Select(info => $"{info.Name}: {info.GetValue(this)}"));
-        }
-    }
-
     public static class TableNodeExtender
     {
         #region Add
@@ -136,7 +124,7 @@ namespace TableLab
             return result.ToArray();
         }
 
-        public static string[][] ToPlainTable(this IEnumerable<IEnumerable<TableNode>> table, string joinSymb = "; ")
+        public static string[][] ToPlainTable(this IEnumerable<IEnumerable<TableNode>> table, string joinSymbol = "; ")
         {
             var tableNodes = table.ToList();
             var result = new List<string[]>();
@@ -146,7 +134,7 @@ namespace TableLab
 
             foreach (var nodeRow in tableNodes)
             {
-                var clearRow = nodeRow.GroupBy(node => node.Title).Select(nodes => nodes.Count() > 1 ? new TableNode { Title = nodes.Key, Value = string.Join(joinSymb, nodes.Select(node => node.Value)) } : nodes.First()).ToList();
+                var clearRow = nodeRow.GroupBy(node => node.Title).Select(nodes => nodes.Count() > 1 ? new TableNode { Title = nodes.Key, Value = string.Join(joinSymbol, nodes.Select(node => node.Value)) } : nodes.First()).ToList();
                 result.Add(header.Select(title => clearRow.Any(node => node.Title.Equals(title)) ? clearRow.First(node => node.Title.Equals(title)).Value.ToString() : "").ToArray());
             }
 
@@ -175,8 +163,8 @@ namespace TableLab
         #region GetBy
 
         public static IEnumerable<TableNode> GetBy(this IEnumerable<TableNode> row, string title) => row.Where(node => node.Title.Equals(title));
-        public static IEnumerable<IEnumerable<TableNode>> GetBy(this IEnumerable<IEnumerable<TableNode>> table, string title)=> table.Select(row=>row.GetBy(title));
-        public static IEnumerable<TableNode> GetByFlat(this IEnumerable<IEnumerable<TableNode>> table, string title)=> table.SelectMany(row=>row.GetBy(title));
+        public static IEnumerable<IEnumerable<TableNode>> GetBy(this IEnumerable<IEnumerable<TableNode>> table, string title) => table.Select(row => row.GetBy(title));
+        public static IEnumerable<TableNode> GetByFlat(this IEnumerable<IEnumerable<TableNode>> table, string title) => table.SelectMany(row => row.GetBy(title));
 
         #endregion
 
