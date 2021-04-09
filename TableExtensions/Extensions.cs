@@ -142,6 +142,24 @@ namespace TableExtensions
         }
         #endregion
 
+        #region Rotate
+
+        public static IEnumerable<IEnumerable<TableNode>> Rotate(this IEnumerable<IEnumerable<TableNode>> table)
+        {
+            var result = new List<List<TableNode>>();
+            var queueCollection = table.Select(nodes => new Queue<TableNode>(nodes)).ToList();
+            while (queueCollection.Any(nodes => nodes.Any()))
+                result.Add(
+                    queueCollection.Select(nodes => 
+                        nodes.Count>0? nodes.Dequeue():null
+                    ).Where(node => node!=null)
+                        .ToList()
+                    );
+            return result;
+        }
+
+        #endregion
+
         #region ToSingleRowString
 
         public static string ToSingleRowString(this string[][] table, int append = 13)
